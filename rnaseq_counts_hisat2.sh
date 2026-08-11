@@ -6,10 +6,27 @@
 # Stop script execution immediately if any command fails
 set -e
 
-
 echo "Started Running Pipeline"
 
 SECONDS=0
+
+# CONFIGURATION PARAMETERS
+
+# check README.md for instructions to find strandedness
+# Options: "reverse", "forward", or "unstranded"
+LIBRARY_TYPE="reverse"
+
+# Automatically resolve the correct tool parameters based on library layout
+if [ "$LIBRARY_TYPE" == "reverse" ]; then
+    HISAT2_STRAND="--rna-strandness R"
+    FC_STRAND="-s 2"
+elif [ "$LIBRARY_TYPE" == "forward" ]; then
+    HISAT2_STRAND="--rna-strandness F"
+    FC_STRAND="-s 1"
+else
+    HISAT2_STRAND="" # Unstranded requires no explicit flag configuration in HISAT2
+    FC_STRAND="-s 0"
+fi
 
 # Step 0: Settings
 echo "Setting Up Working Environment"
@@ -41,7 +58,7 @@ echo "Aligning Reads to Human Reference Genome"
 # tar -xvf grch38_genome.tar.gz
 
 # run alignment
-hisat2 -q --rna-strandness R -x HISAT2/grch38/genome -U data/sample_trimmed.fastq | samtools sort -o HISAT2/sample_trimmed.bam
+hisat2 -q $HISAT2_STRAND -x HISAT2/grch38/genome -U data/sample_trimmed.fastq | samtools sort -o HISAT2/sample_trimmed.bam
 
 echo "HISAT2 finished running!"
 
@@ -50,7 +67,7 @@ echo "HISAT2 finished running!"
 
 echo "Quantifying Gene Expression Levels"                                                      
 
-featureCounts -S 2 -a quants/Homo_sapiens.GRCh38.116.gtf -o quants/sample_featurecounts.txt HISAT2/sample_trimmed.bam
+featureCounts $FC_STRAND -a quants/Homo_sapiens.GRCh38.116.gtf -o quants/sample_featurecounts.txt HISAT2/sample_trimmed.bam
 echo "featureCounts finished running!"
 
 # Complete Pipeline Success Log
