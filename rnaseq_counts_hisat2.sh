@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # RNA-Seq Alignment & Quantification Pipeline (VMware/HGFS Optimized Syntax)
+# configured strictly for standard, single-sample Single-End (SE) processing
 #---------------------------------------------------------------------------
 
 # Stop script execution immediately if any command fails
