@@ -30,6 +30,22 @@ wget https://ftp.ensembl.org/pub/release-116/gtf/homo_sapiens/Homo_sapiens.GRCh3
 gunzip Homo_sapiens.GRCh38.116.gtf.gz
 ```
 
+## How to Check Library Strandedness
+If you inherit unlabelled data, use `infer_experiment.py` from the **RSeQC** library on a tiny subset of your data to figure it out:
+
+```bash
+# 1. Install RSeQC inside your environment
+conda install -c bioconda rseqc -y
+
+# 2. Check strandedness using your unzipped GTF and an alignment file
+infer_experiment.py -i HISAT2/sample_trimmed.bam -r quants/Homo_sapiens.GRCh38.116.gtf
+```
+
+### How to interpret the RSeQC output logs:
+* If fraction of reads explained by **"1++,1--,2+-,2-+"** is high (>0.8) $\rightarrow$ **Stranded-Forward** (`LIBRARY_TYPE="forward"`).
+* If fraction of reads explained by **"1+-,1-+,2++,2--"** is high (>0.8) $\rightarrow$ **Stranded-Reverse** (`LIBRARY_TYPE="reverse"`).
+* If both fractions are roughly equal (~0.5 each) $\rightarrow$ **Unstranded** (`LIBRARY_TYPE="unstranded"`).
+
 ## Standard Workflow Execution
 Make sure your raw input file inside the `data` folder is named **`sample.fastq`**, then run:
 ```bash
