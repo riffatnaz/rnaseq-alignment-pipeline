@@ -53,10 +53,6 @@ fastqc data/sample_trimmed.fastq -o data/
 # STEP 2: Stream alignments directly into coordinate-sorted binary records
 echo "Aligning Reads to Human Reference Genome"
 
-# get the genome indices
-# wget https://genome-idx.s3.amazonaws.com/hisat/grch38_genome.tar.gz
-# tar -xvf grch38_genome.tar.gz
-
 # run alignment
 hisat2 -q $HISAT2_STRAND -x HISAT2/grch38/genome -U data/sample_trimmed.fastq | samtools sort -o HISAT2/sample_trimmed.bam
 
